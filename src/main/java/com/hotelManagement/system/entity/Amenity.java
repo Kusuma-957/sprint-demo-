@@ -11,9 +11,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "Amenity")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class Amenity {
 
     @Id
@@ -34,3 +43,6 @@ public class Amenity {
 
     // Getters & setters
 }
+
+
+
