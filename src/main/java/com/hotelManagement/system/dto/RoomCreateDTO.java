@@ -8,8 +8,8 @@ import lombok.Setter;
 @Setter
 public class RoomCreateDTO {
 
-    @NotNull
-    private Integer hotelId;
+//    @NotNull
+//    private Integer hotelId;
 
     @NotNull
     private Integer roomNumber;

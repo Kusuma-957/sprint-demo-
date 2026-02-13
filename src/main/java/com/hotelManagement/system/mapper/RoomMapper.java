@@ -27,12 +27,12 @@ public class RoomMapper {
     public static RoomResponseDTO toResponse(Room room) {
         return new RoomResponseDTO(
                 room.getRoomId(),
-                room.getHotel().getHotelId(),
                 room.getRoomNumber(),
                 room.getRoomType().getRoomTypeId(),
                 room.getIsAvailable()
         );
     }
+//  room.getHotel().getHotelId(),
 
     public static List<RoomResponseDTO> toResponseList(List<Room> list) {
         return list.stream().map(RoomMapper::toResponse).toList();

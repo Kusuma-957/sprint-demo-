@@ -28,14 +28,14 @@ public class RoomService {
 
     public RoomResponseDTO create(RoomCreateDTO dto) {
 
-        Hotel hotel = hotelRepository.findById(dto.getHotelId())
-                .orElseThrow(() -> new IllegalArgumentException("Hotel not found"));
+//        Hotel hotel = hotelRepository.findById(dto.getHotelId())
+//                .orElseThrow(() -> new IllegalArgumentException("Hotel not found"));
 
         RoomType type = roomTypeRepository.findById(dto.getRoomTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("RoomType not found"));
 
         Room room = RoomMapper.toEntity(dto);
-        room.setHotel(hotel);
+        //room.setHotel(hotel);
         room.setRoomType(type);
 
         Room saved = roomRepository.save(room);
@@ -69,9 +69,9 @@ public class RoomService {
         return RoomMapper.toResponseList(roomRepository.findAvailableRoomsByType(typeId));
     }
 
-    public List<RoomResponseDTO> getByLocation(String location) {
-        return RoomMapper.toResponseList(roomRepository.findRoomsByLocation(location));
-    }
+//    public List<RoomResponseDTO> getByLocation(String location) {
+//        return RoomMapper.toResponseList(roomRepository.findRoomsByLocation(location));
+//    }
 
     public List<RoomResponseDTO> getByAmenity(Integer amenityId) {
         return RoomMapper.toResponseList(roomRepository.findRoomsByAmenity(amenityId));

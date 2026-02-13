@@ -25,13 +25,13 @@ public class RoomTypeController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<RoomTypeResponseDTO> update(
-            @PathVariable Integer id,
+            @PathVariable("id") Integer id,
             @Valid @RequestBody RoomTypeUpdateDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RoomTypeResponseDTO> get(@PathVariable Integer id) {
+    public ResponseEntity<RoomTypeResponseDTO> get(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(service.get(id));
     }
 

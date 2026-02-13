@@ -7,10 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RoomResponseDTO {
+public class RoomAmenityResponseDTO {
     private Integer roomId;
-    //private Integer hotelId;
-    private Integer roomNumber;
-    private Integer roomTypeId;
-    private Boolean isAvailable;
+    private Integer amenityId;
 }

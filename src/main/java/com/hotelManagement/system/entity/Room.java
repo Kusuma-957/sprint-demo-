@@ -43,7 +43,7 @@ public class Room {
 
     @ManyToMany
     @JoinTable(
-        name = "RoomAmenity",
+        name = "roomamenity",
         joinColumns = @JoinColumn(name = "room_id"),
         inverseJoinColumns = @JoinColumn(name = "amenity_id")
     )

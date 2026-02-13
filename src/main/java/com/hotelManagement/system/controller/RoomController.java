@@ -34,33 +34,33 @@ public class RoomController {
 
     // CSV: GET /api/room/{roomId}
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomResponseDTO> getById(@PathVariable Integer roomId) {
+    public ResponseEntity<RoomResponseDTO> getById(@PathVariable("roomId") Integer roomId) {
         return ResponseEntity.ok(roomService.getById(roomId));
     }
 
     // CSV: PUT /api/room/update/{roomId}
     @PutMapping("/update/{roomId}")
     public ResponseEntity<RoomResponseDTO> update(
-            @PathVariable Integer roomId,
+            @PathVariable("roomId") Integer roomId,
             @Valid @RequestBody RoomUpdateDTO dto) {
         return ResponseEntity.ok(roomService.update(roomId, dto));
     }
 
     // CSV: GET /api/rooms/available/{roomTypeId}
     @GetMapping("/available/{roomTypeId}")
-    public ResponseEntity<List<RoomResponseDTO>> getAvailable(@PathVariable Integer roomTypeId) {
+    public ResponseEntity<List<RoomResponseDTO>> getAvailable(@PathVariable("roomTypeId") Integer roomTypeId) {
         return ResponseEntity.ok(roomService.getAvailableByType(roomTypeId));
     }
 
     // CSV: GET /api/rooms/location/{location}
-    @GetMapping("/location/{location}")
-    public ResponseEntity<List<RoomResponseDTO>> getByLocation(@PathVariable String location) {
-        return ResponseEntity.ok(roomService.getByLocation(location));
-    }
+//    @GetMapping("/location/{location}")
+//    public ResponseEntity<List<RoomResponseDTO>> getByLocation(@PathVariable String location) {
+//        return ResponseEntity.ok(roomService.getByLocation(location));
+//    }
 
     // FIXED: CSV duplicated two endpoints → unified to safe path
     @GetMapping("/by-amenity/{amenityId}")
-    public ResponseEntity<List<RoomResponseDTO>> getByAmenity(@PathVariable Integer amenityId) {
+    public ResponseEntity<List<RoomResponseDTO>> getByAmenity(@PathVariable("amenityId") Integer amenityId) {
         return ResponseEntity.ok(roomService.getByAmenity(amenityId));
     }
 }
