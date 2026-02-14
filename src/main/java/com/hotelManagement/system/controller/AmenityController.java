@@ -155,3 +155,4 @@ public class AmenityController {
         return ResponseEntity.ok(body);
     }
 }
+
