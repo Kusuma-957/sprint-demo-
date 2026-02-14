@@ -7,6 +7,8 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,7 +41,11 @@ public class Payment {
 
     private LocalDate paymentDate;
 
-    private String paymentStatus;
+   // private String paymentStatus;
+    
+    @Enumerated(EnumType.STRING) // <-- important
+    @Column(name = "payment_status", nullable = false, length = 20)
+    private PaymentStatus paymentStatus;
 
 
     // Getters & setters

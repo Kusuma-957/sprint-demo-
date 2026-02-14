@@ -23,4 +23,10 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
         where a.amenityId = :amenityId
     """)
     List<Room> findRoomsByAmenity(@Param("amenityId") Integer amenityId);
+    
+    
+    boolean existsByRoomNumber(Integer roomNumber);
+    
+
+	
 }

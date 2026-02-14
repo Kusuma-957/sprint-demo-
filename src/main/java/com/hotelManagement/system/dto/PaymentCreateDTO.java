@@ -1,11 +1,14 @@
 package com.hotelManagement.system.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+
+import com.hotelManagement.system.entity.PaymentStatus;
 
 @Getter
 @Setter
@@ -20,7 +23,7 @@ public class PaymentCreateDTO {
 
     // e.g., PAID, PENDING, FAILED (string per your entity)
     @NotNull
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     // paymentDate is NOT sent by client; service will set LocalDate.now()
 }

@@ -1,11 +1,14 @@
 package com.hotelManagement.system.dto;
 
 import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import com.hotelManagement.system.entity.PaymentStatus;
 
 @Getter
 @Setter
@@ -15,6 +18,8 @@ public class PaymentResponseDTO {
     private Integer paymentId;
     private Integer reservationId;
     private BigDecimal amount;
-    private String paymentStatus;
+    
+    private PaymentStatus paymentStatus;
+    
     private LocalDate paymentDate;
 }
