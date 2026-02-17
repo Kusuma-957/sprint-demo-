@@ -14,7 +14,10 @@ public class ReviewMapper {
         if (entity == null) return null;
         ReviewResponseDTO dto = new ReviewResponseDTO();
         dto.setReviewId(entity.getReviewId());
-        dto.setReservationId(entity.getReservation() != null ? getReservationId(entity.getReservation()) : null);
+        //dto.setReservationId(entity.getReservation() != null ? getReservationId(entity.getReservation()) : null);
+        dto.setReservationId(entity.getReservation() != null
+            ? entity.getReservation().getReservationId()
+            : null);
         dto.setRating(entity.getRating());
         dto.setComment(entity.getComment());
         dto.setReviewDate(entity.getReviewDate());
@@ -36,23 +39,5 @@ public class ReviewMapper {
         if (req.getRating() != null) entity.setRating(req.getRating());
         if (req.getComment() != null) entity.setComment(req.getComment());
         if (req.getReviewDate() != null) entity.setReviewDate(req.getReviewDate());
-    }
-
-    // Helper to avoid relying on Reservation's field name
-    private static Integer getReservationId(Reservation reservation) {
-        try {
-            // Try common names via reflection to avoid changing entities
-            var field = reservation.getClass().getDeclaredField("reservationId");
-            field.setAccessible(true);
-            return (Integer) field.get(reservation);
-        } catch (Exception ex) {
-            try {
-                var field = reservation.getClass().getDeclaredField("id");
-                field.setAccessible(true);
-                return (Integer) field.get(reservation);
-            } catch (Exception ignored) {
-                return null;
-            }
-        }
     }
 }

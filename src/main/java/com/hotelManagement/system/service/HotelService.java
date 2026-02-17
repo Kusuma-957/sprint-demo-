@@ -128,10 +128,10 @@ public class HotelService {
     public HotelResponseDTO update(Integer hotelId, HotelUpdateDTO dto) {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel doesn't exist"));
-
+        //Checks in DB, Whether with the same name + location, any records are there.
         boolean conflict = hotelRepository
                 .existsByNameIgnoreCaseAndLocationIgnoreCase(dto.getName(), dto.getLocation());
-
+        //Checks whether the current (I.E DTO) is same as the hotel - same record(whether any updates are there or not)
         boolean same = dto.getName().equalsIgnoreCase(hotel.getName())
                 && dto.getLocation().equalsIgnoreCase(hotel.getLocation());
 

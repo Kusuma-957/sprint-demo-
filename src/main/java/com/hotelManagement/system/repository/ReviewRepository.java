@@ -11,15 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
-
-    // Existing native query: listing by reservation
-    @Query(
-        value = "SELECT * FROM Review WHERE reservation_id = :reservationId",
-        countQuery = "SELECT COUNT(*) FROM Review WHERE reservation_id = :reservationId",
-        nativeQuery = true
-    )
-    Page<Review> findByReservationId(@Param("reservationId") Integer reservationId, Pageable pageable);
-
     /**
      * Duplicate check: same (reservationId, comment (case-insensitive), rating, reviewDate).
      * We LOWER(CAST(comment AS string)) on entity side and compare with already-lowercased param.

@@ -9,6 +9,7 @@ import com.hotelManagement.system.exception.ConflictException;
 import com.hotelManagement.system.exception.EmptyListException;
 import com.hotelManagement.system.exception.ResourceNotFoundException;
 import com.hotelManagement.system.mapper.ReviewMapper;
+import com.hotelManagement.system.repository.ReservationRepository;
 import com.hotelManagement.system.repository.ReviewRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -25,13 +26,16 @@ import java.util.Locale;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-
+    private final ReservationRepository reservationRepository;
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ReviewService(ReviewRepository reviewRepository) {
+
+    public ReviewService(ReviewRepository reviewRepository, ReservationRepository reservationRepository) {   // <-- add this
         this.reviewRepository = reviewRepository;
+        this.reservationRepository = reservationRepository;     // <-- assign it
     }
+
 
     /**
      * POST /api/review/post
@@ -42,6 +46,11 @@ public class ReviewService {
         // Normalize comment: trim + toLowerCase for dup check; persist trimmed form
         final String trimmed = request.getComment() == null ? null : request.getComment().trim();
         final String normalizedLower = trimmed == null ? null : trimmed.toLowerCase(Locale.ROOT);
+        Integer reservationId = request.getReservationId();
+        if (!reservationRepository.existsById(reservationId)) {
+            // -> Global handler maps to 404 with code GETFAILS (or a specific code for create)
+            throw new ResourceNotFoundException("Reservation with id doesn't exist");
+        }
 
         boolean duplicate = reviewRepository.existsDuplicate(
                 request.getReservationId(),
@@ -110,12 +119,6 @@ public class ReviewService {
         return reviews.stream().map(ReviewMapper::toDto).toList();
     }
 
-    /**
-     * GET (paged) if you still need pagination elsewhere.
-     */
-    public Page<ReviewResponseDTO> list(Pageable pageable) {
-        return reviewRepository.findAll(pageable).map(ReviewMapper::toDto);
-    }
 
     /**
      * PUT /api/review/update/{review_id}

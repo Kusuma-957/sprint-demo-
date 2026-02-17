@@ -88,7 +88,7 @@ public class AmenityController {
 
     @PostMapping("/post")
     public ResponseEntity<ApiResponse<AmenityResponseDTO>> create(@RequestBody AmenityCreateDTO dto) {
-        AmenityResponseDTO created = amenityService.create(dto);
+         AmenityResponseDTO created = amenityService.create(dto);
         ApiResponse<AmenityResponseDTO> body = ApiResponse.<AmenityResponseDTO>builder()
                 .code(ApiCode.POSTSUCCESS)
                 .message("Amenity added successfully")
