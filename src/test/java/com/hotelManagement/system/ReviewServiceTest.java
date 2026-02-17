@@ -373,6 +373,7 @@ import com.hotelManagement.system.entity.Review;
 import com.hotelManagement.system.exception.ConflictException;
 import com.hotelManagement.system.exception.EmptyListException;
 import com.hotelManagement.system.exception.ResourceNotFoundException;
+import com.hotelManagement.system.repository.ReservationRepository;
 import com.hotelManagement.system.repository.ReviewRepository;
 import com.hotelManagement.system.service.ReviewService;
 
@@ -400,11 +401,11 @@ import static org.mockito.Mockito.*;
 class ReviewServiceTest {
 
     @Mock private ReviewRepository reviewRepository;
+    @Mock private ReservationRepository reservationRepository;
     @Mock private EntityManager entityManager;
 
     @InjectMocks
     private ReviewService reviewService;
-
     private ReviewCreateRequest createReq;
     private ReviewUpdateRequest updateReq;
 
@@ -449,51 +450,85 @@ class ReviewServiceTest {
     // ---------------- create -----------------
 
     @Test
-    @DisplayName("create: duplicate → ConflictException")
-    void create_duplicate_throwsConflict() {
-        final String trimmed = "Great Stay!";
-        final String lower = trimmed.toLowerCase(Locale.ROOT);
+       @DisplayName("create: reservation missing -> throws ResourceNotFoundException with expected message")
+       void create_reservationMissing_throwsNotFound() {
+           // Arrange
+           when(reservationRepository.existsById(11)).thenReturn(false);
 
-        when(reviewRepository.existsDuplicate(11, lower, 5, D)).thenReturn(true);
+           // Act + Assert
+           ResourceNotFoundException ex = assertThrows(
+                   ResourceNotFoundException.class,
+                   () -> reviewService.create(createReq)
+           );
+           assertTrue(ex.getMessage().contains("Reservation with id doesn't exist"));
 
-        ConflictException ex = assertThrows(ConflictException.class,
-                () -> reviewService.create(createReq));
+           verify(reservationRepository).existsById(11);
+           verifyNoInteractions(reviewRepository, entityManager);
+       }
 
-        assertTrue(ex.getMessage().contains("Review already exist"));
+       @Test
+       @DisplayName("create: duplicate review exists (normalized) -> throws ConflictException")
+       void create_duplicate_throwsConflict() {
+           // Arrange
+           when(reservationRepository.existsById(11)).thenReturn(true);
 
-        verify(reviewRepository).existsDuplicate(11, lower, 5, D);
-        verifyNoInteractions(entityManager);
-    }
+           String trimmed = "Great Stay!";
+           String normalizedLower = trimmed.toLowerCase(Locale.ROOT);
+           when(reviewRepository.existsDuplicate(11, normalizedLower, 5, D)).thenReturn(true);
 
-    @Test
-    @DisplayName("create: happy path → save & map DTO")
-    void create_ok_savesAndReturns() {
-        final String trimmed = "Great Stay!";
-        final String lower = trimmed.toLowerCase(Locale.ROOT);
+           // Act + Assert
+           ConflictException ex = assertThrows(
+                   ConflictException.class,
+                   () -> reviewService.create(createReq)
+           );
+           assertTrue(ex.getMessage().contains("Review already exist"));
 
-        when(reviewRepository.existsDuplicate(11, lower, 5, D)).thenReturn(false);
+           verify(reservationRepository).existsById(11);
+           verify(reviewRepository).existsDuplicate(11, normalizedLower, 5, D);
+           verifyNoMoreInteractions(reviewRepository);
+           verifyNoInteractions(entityManager);
+       }
 
-        Reservation ref = reservation(11);
-        when(entityManager.getReference(Reservation.class, 11)).thenReturn(ref);
+       @Test
+       @DisplayName("create: happy path -> normalizes comment, checks duplicate, gets ref, saves and returns DTO")
+       void create_ok_savesAndReturns() {
+           // Arrange
+           when(reservationRepository.existsById(11)).thenReturn(true);
 
-        ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
+           String trimmed = "Great Stay!";
+           String normalizedLower = trimmed.toLowerCase(Locale.ROOT);
+           when(reviewRepository.existsDuplicate(11, normalizedLower, 5, D)).thenReturn(false);
 
-        Review saved = review(101, 11, 5, trimmed, D);
-        when(reviewRepository.save(any(Review.class))).thenReturn(saved);
+           Reservation ref = reservation(11);
+           when(entityManager.getReference(Reservation.class, 11)).thenReturn(ref);
 
-        ReviewResponseDTO dto = reviewService.create(createReq);
+           Review saved = review(101, 11, 5, trimmed, D);
+           ArgumentCaptor<Review> captor = ArgumentCaptor.forClass(Review.class);
+           when(reviewRepository.save(any(Review.class))).thenReturn(saved);
 
-        assertNotNull(dto);
-        assertEquals(101, dto.getReviewId());
-        assertEquals(11, dto.getReservationId());
-        assertEquals(5, dto.getRating());
-        assertEquals("Great Stay!", dto.getComment());
-        assertEquals(D, dto.getReviewDate());
+           // Act
+           ReviewResponseDTO dto = reviewService.create(createReq);
 
-        verify(reviewRepository).save(captor.capture());
-        Review persisted = captor.getValue();
-        assertEquals("Great Stay!", persisted.getComment());
-    }
+           // Assert DTO
+           assertNotNull(dto);
+           assertEquals(101, dto.getReviewId());
+           assertEquals(11, dto.getReservationId());
+           assertEquals(5, dto.getRating());
+           assertEquals("Great Stay!", dto.getComment());
+           assertEquals(D, dto.getReviewDate());
+
+           // Verify inputs and side effects
+           verify(reservationRepository).existsById(11);
+           verify(reviewRepository).existsDuplicate(11, normalizedLower, 5, D);
+           verify(entityManager).getReference(Reservation.class, 11);
+           verify(reviewRepository).save(captor.capture());
+
+           Review toPersist = captor.getValue();
+           assertEquals(11, toPersist.getReservation().getReservationId());
+           assertEquals("Great Stay!", toPersist.getComment()); // trimmed persisted
+           assertEquals(5, toPersist.getRating());
+           assertEquals(D, toPersist.getReviewDate());
+       }
 
 
     // ---------------- getAll -----------------
